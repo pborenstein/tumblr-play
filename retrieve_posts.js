@@ -1,21 +1,66 @@
 'use strict';
-var async = require('async');
-var _ = require('lodash');
-var tumblr = require('tumblr.js');
-var assert = require('better-assert');
+var async   = require('async');
+var _       = require('lodash');
+var tumblr  = require('tumblr.js');
+var assert  = require('better-assert');
+var chalk   = require('chalk');
+var argv = require('minimist')(process.argv.slice(2));
+var path = require('path');
+var osHomedir = require('os-homedir');
+var fs = require('fs');
+var JSON5 = require('json5');
 
-assert(_.isString(process.env.CONSUMER_KEY) && process.env.CONSUMER_KEY.length > 0);
-assert(_.isString(process.env.CONSUMER_SECRET) && process.env.CONSUMER_SECRET.length > 0);
-assert(_.isString(process.env.TOKEN) && process.env.TOKEN.length > 0);
-assert(_.isString(process.env.TOKEN_SECRET) && process.env.TOKEN_SECRET.length > 0);
-assert(_.isString(process.env.BLOG_NAME) && process.env.BLOG_NAME.length > 0);
 
-var client = tumblr.createClient({
-  consumer_key: process.env.CONSUMER_KEY,
-  consumer_secret: process.env.CONSUMER_SECRET,
-  token: process.env.TOKEN,
-  token_secret: process.env.TOKEN_SECRET,
-});
+// assert(_.isString(process.env.CONSUMER_KEY) && process.env.CONSUMER_KEY.length > 0);
+// assert(_.isString(process.env.CONSUMER_SECRET) && process.env.CONSUMER_SECRET.length > 0);
+// assert(_.isString(process.env.TOKEN) && process.env.TOKEN.length > 0);
+// assert(_.isString(process.env.TOKEN_SECRET) && process.env.TOKEN_SECRET.length > 0);
+// assert(_.isString(process.env.BLOG_NAME) && process.env.BLOG_NAME.length > 0);
+
+// Load credentials
+var credentials = (function() {
+    var credsFile = argv.credentials || _.find([
+        'tumblr-credentials.json',
+        'credentials.json',
+        path.join(osHomedir(), 'tumblr-credentials.json'),
+    ], function(credsFile) {
+        return fs.existsSync(credsFile);
+    }) || 'credentials.json';
+
+    try {
+        var credentials = JSON5.parse(fs.readFileSync(credsFile).toString());
+    } catch (e) {
+        console.error(chalk.red('Error loading credentials!'));
+        console.error('Make sure %s exists or specify %s', chalk.cyan(credsFile || 'credentials.json'), chalk.cyan('--credentials=path/to/credentials.json'));
+        process.exit();
+    }
+
+    // console.log('\nUsing OAuth creds from %s\n', chalk.magenta(path.resolve(credsFile)));
+
+    var missingCredentials = _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'], _.partial(_.negate(_.has), credentials));
+    if (!_.isEmpty(missingCredentials)) {
+        console.warn(chalk.yellow('Credentials is missing keys:'));
+        missingCredentials.forEach(function(key) {
+            console.warn(chalk.yellow('  * %s'), key);
+        });
+
+        if (credentials.consumer_key && credentials.consumer_secret) {
+            console.log('\nYou can generate user tokens by going to the API console:\n');
+            console.log(chalk.magenta([
+                'https://api.tumblr.com/console/auth',
+                '?consumer_key=', credentials.consumer_key,
+                '&consumer_secret=', credentials.consumer_secret,
+            ].join('')));
+        }
+    }
+
+    return credentials;
+})();
+
+
+
+
+var client = tumblr.createClient(credentials);
 
 // quick & dirty it is, life's short, done is better than perfect, I only had 2 hours for the whole project.
 // boy, I need to go past this, my eyes are bleeding...
@@ -26,10 +71,12 @@ var LIMIT = 20;
 var arr = [];
 
 function done(err) {
+  console.error('err', err)
   console.log(JSON.stringify(arr));
 }
 
 function tooManySideEffects(next) {
+  console.error("offset:", offset)
   client.posts(process.env.BLOG_NAME, {
     notes_info: true,
     limit: LIMIT,
@@ -53,6 +100,7 @@ function tooManySideEffects(next) {
     }
 
     arr.push.apply(arr, data.posts);
+    console.error('arr.length:', arr.length)
     next();
   });
 }
