@@ -32,3 +32,6 @@ likers_websites.txt
 notes_*
 posts.json
 posts_only_notes.json
+credentials*.json
+*.json
+!package.json
