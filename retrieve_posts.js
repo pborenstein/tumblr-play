@@ -10,12 +10,6 @@ var osHomedir = require('os-homedir');
 var fs        = require('fs');
 var JSON5     = require('json5');
 
-// assert(_.isString(process.env.CONSUMER_KEY) && process.env.CONSUMER_KEY.length > 0);
-// assert(_.isString(process.env.CONSUMER_SECRET) && process.env.CONSUMER_SECRET.length > 0);
-// assert(_.isString(process.env.TOKEN) && process.env.TOKEN.length > 0);
-// assert(_.isString(process.env.TOKEN_SECRET) && process.env.TOKEN_SECRET.length > 0);
-// assert(_.isString(process.env.BLOG_NAME) && process.env.BLOG_NAME.length > 0);
-
 // Load credentials
 var credentials = (function() {
     var credsFile = argv.credentials || _.find([
@@ -65,9 +59,13 @@ var client = tumblr.createClient(credentials);
 // boy, I need to go past this, my eyes are bleeding...
 // ... farewell code, hope I will never see you again.
 
-var offset = 0;
-var LIMIT = 20;
 var arr = [];
+var options = {
+  notes_info: true,
+  limit: 20,
+  offset: 0
+}
+
 
 //  This gets called when there are no more posts to get
 function done(err) {
@@ -78,8 +76,8 @@ function done(err) {
 
 
 function getPosts(next) {
+
   function onTumblrData(err, data) {
-    console.error('onTumblrData', offset)
     if (err) {
       console.error(err);
       return _.defer(next);
@@ -90,7 +88,7 @@ function getPosts(next) {
       return _.defer(next);
     }
 
-    offset += LIMIT;
+    options.offset += options.limit;
 
     if (data.posts.length === 0) {
       // stop there we are done
@@ -106,14 +104,9 @@ function getPosts(next) {
               // Like I get it, but I don't know why it works
   }
 
-  client.posts(process.env.BLOG_NAME,
-    {
-      notes_info: true,
-      limit: LIMIT,
-      offset: offset
-    },
-    onTumblrData
-  );
+  console.error('options', options)
+
+  client.posts(process.env.BLOG_NAME, options, onTumblrData);
 }
 
 async.forever(getPosts, done);
