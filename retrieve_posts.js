@@ -69,15 +69,17 @@ var offset = 0;
 var LIMIT = 20;
 var arr = [];
 
-//  This gets called 
+//  This gets called when there are no more posts to get
 function done(err) {
   console.error('err', err)
   console.log(JSON.stringify(arr));
 }
 
 
+
 function getPosts(next) {
   function onTumblrData(err, data) {
+    console.error('onTumblrData', offset)
     if (err) {
       console.error(err);
       return _.defer(next);
@@ -95,11 +97,13 @@ function getPosts(next) {
       return next('done');
     }
 
-    arr.push.apply(arr, data.posts);          // idiom for adding an array to
-    // an existing array
-    // Here we're adding `data.posts`
-    // to `arr`
-    next();
+    arr.push.apply(arr, data.posts);      // idiom for adding an array to
+                                          // an existing array
+                                          // Here we're adding `data.posts`
+                                          // to `arr`
+    next();   // call getPosts again
+              // This still feels like magic to me.
+              // Like I get it, but I don't know why it works
   }
 
   client.posts(process.env.BLOG_NAME,
@@ -112,9 +116,4 @@ function getPosts(next) {
   );
 }
 
-
-function tooManySideEffects(next) {
-  getPosts(next)
-}
-
-async.forever(tooManySideEffects, done);
+async.forever(getPosts, done);
