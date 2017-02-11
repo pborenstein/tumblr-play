@@ -69,10 +69,8 @@ var options = {
 
 //  This gets called when there are no more posts to get
 function done(err) {
-  console.error('err', err)
   console.log(JSON.stringify(arr));
 }
-
 
 
 function getPosts(next) {
@@ -103,8 +101,6 @@ function getPosts(next) {
               // This still feels like magic to me.
               // Like I get it, but I don't know why it works
   }
-
-  console.error('options', options)
 
   client.posts(process.env.BLOG_NAME, options, onTumblrData);
 }
