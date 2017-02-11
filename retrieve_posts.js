@@ -1,15 +1,14 @@
 'use strict';
-var async   = require('async');
-var _       = require('lodash');
-var tumblr  = require('tumblr.js');
-var assert  = require('better-assert');
-var chalk   = require('chalk');
-var argv = require('minimist')(process.argv.slice(2));
-var path = require('path');
+var async     = require('async');
+var _         = require('lodash');
+var tumblr    = require('tumblr.js');
+var assert    = require('better-assert');
+var chalk     = require('chalk');
+var argv      = require('minimist')(process.argv.slice(2));
+var path      = require('path');
 var osHomedir = require('os-homedir');
-var fs = require('fs');
-var JSON5 = require('json5');
-
+var fs        = require('fs');
+var JSON5     = require('json5');
 
 // assert(_.isString(process.env.CONSUMER_KEY) && process.env.CONSUMER_KEY.length > 0);
 // assert(_.isString(process.env.CONSUMER_SECRET) && process.env.CONSUMER_SECRET.length > 0);
@@ -70,24 +69,21 @@ var offset = 0;
 var LIMIT = 20;
 var arr = [];
 
+//  This gets called 
 function done(err) {
   console.error('err', err)
   console.log(JSON.stringify(arr));
 }
 
-function tooManySideEffects(next) {
-  console.error("offset:", offset)
-  client.posts(process.env.BLOG_NAME, {
-    notes_info: true,
-    limit: LIMIT,
-    offset: offset
-  }, function onTumblrData(err, data) {
+
+function getPosts(next) {
+  function onTumblrData(err, data) {
     if (err) {
       console.error(err);
       return _.defer(next);
     }
 
-    if (!_.isObject(data) ||  !_.isArray(data.posts)) {
+    if (!_.isObject(data) || !_.isArray(data.posts)) {
       console.error('Invalid data received', data);
       return _.defer(next);
     }
@@ -99,10 +95,26 @@ function tooManySideEffects(next) {
       return next('done');
     }
 
-    arr.push.apply(arr, data.posts);
-    console.error('arr.length:', arr.length)
+    arr.push.apply(arr, data.posts);          // idiom for adding an array to
+    // an existing array
+    // Here we're adding `data.posts`
+    // to `arr`
     next();
-  });
+  }
+
+  client.posts(process.env.BLOG_NAME,
+    {
+      notes_info: true,
+      limit: LIMIT,
+      offset: offset
+    },
+    onTumblrData
+  );
+}
+
+
+function tooManySideEffects(next) {
+  getPosts(next)
 }
 
 async.forever(tooManySideEffects, done);
