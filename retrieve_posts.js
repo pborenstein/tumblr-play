@@ -30,7 +30,26 @@ var credentials = (function() {
 
     // console.log('\nUsing OAuth creds from %s\n', chalk.magenta(path.resolve(credsFile)));
 
-    var missingCredentials = _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'], _.partial(_.negate(_.has), credentials));
+//     var missingCredentials = 
+//           _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
+//                     _.partial(_.negate(_.has), credentials));
+// 
+// could do
+// ['consumer_key', 'consdumer_secret', 'token', 'token_secret']
+//    .reduce(function(acc,x){return acc && credentials.hasOwnProperty(x)}, true)
+// but that won't tell you what's missing
+//
+// but see: https://www.sitepoint.com/lodash-features-replace-es6/#5partial
+//  var sayHelloTo = _.partial(greet, 'hello');
+//  const sayHelloTo = name => greet('hello', name);
+//
+// so
+//  _.partial(_.negate(_.has), credentials)
+//  cred => !credentials.hasOwnProperty(cred)
+
+
+var missingCredentials = _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'], cred => !credentials.hasOwnProperty(cred))
+
     if (!_.isEmpty(missingCredentials)) {
         console.warn(chalk.yellow('Credentials is missing keys:'));
         missingCredentials.forEach(function(key) {
