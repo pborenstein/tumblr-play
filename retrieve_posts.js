@@ -48,7 +48,9 @@ var credentials = (function() {
 //  cred => !credentials.hasOwnProperty(cred)
 
 
-var missingCredentials = _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'], cred => !credentials.hasOwnProperty(cred))
+    var missingCredentials = 
+          _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
+                   cred => !credentials.hasOwnProperty(cred))
 
     if (!_.isEmpty(missingCredentials)) {
         console.warn(chalk.yellow('Credentials is missing keys:'));
