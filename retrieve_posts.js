@@ -48,7 +48,9 @@ var credentials = (function() {
 //  cred => !credentials.hasOwnProperty(cred)
 
 
-var missingCredentials = _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'], cred => !credentials.hasOwnProperty(cred))
+var missingCredentials =
+    _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
+             cred => !credentials.hasOwnProperty(cred))
 
     if (!_.isEmpty(missingCredentials)) {
         console.warn(chalk.yellow('Credentials is missing keys:'));
@@ -94,6 +96,8 @@ function done(err) {
 
 function getPosts(next) {
 
+  client.posts(process.env.BLOG_NAME, options, onTumblrData);
+
   function onTumblrData(err, data) {
     if (err) {
       console.error(err);
@@ -116,12 +120,13 @@ function getPosts(next) {
                                           // an existing array
                                           // Here we're adding `data.posts`
                                           // to `arr`
+ 
+    console.error('arr.length', arr.length)
+ 
     next();   // call getPosts again
               // This still feels like magic to me.
               // Like I get it, but I don't know why it works
   }
-
-  client.posts(process.env.BLOG_NAME, options, onTumblrData);
 }
 
 async.forever(getPosts, done);
