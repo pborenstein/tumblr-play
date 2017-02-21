@@ -35,22 +35,35 @@ var credentials = (function() {
 //                     _.partial(_.negate(_.has), credentials));
 // 
 // could do
-// ['consumer_key', 'consdumer_secret', 'token', 'token_secret']
-//    .reduce(function(acc,x){return acc && credentials.hasOwnProperty(x)}, true)
+//    ['consumer_key', 'consdumer_secret', 'token', 'token_secret']
+//      .reduce(function(acc,x){return acc && credentials.hasOwnProperty(x)}, true)
 // but that won't tell you what's missing
 //
 // but see: https://www.sitepoint.com/lodash-features-replace-es6/#5partial
 //  var sayHelloTo = _.partial(greet, 'hello');
 //  const sayHelloTo = name => greet('hello', name);
 //
-// so
-//  _.partial(_.negate(_.has), credentials)
-//  cred => !credentials.hasOwnProperty(cred)
+// so we can replace:
+//    _.partial(_.negate(_.has), credentials)
+// with this:
+//    cred => !credentials.hasOwnProperty(cred)
+//
+//  So the missing credentials:
+//    _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
+//                   cred => !credentials.hasOwnProperty(cred))
+//
+//    Remove from the list any element
+//      that is not a property of the credentials object
+//      return the removed elements
+//    Which is really kind of a counterintuitive way of doing this.
+//    what you want to say is 
+//      here' a list of keys
+//      tell me which ones aren't in the credential object
+//      This says --- ugh it makes my brain hurt
 
-
-var missingCredentials =
-    _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
-             cred => !credentials.hasOwnProperty(cred))
+    var missingCredentials = 
+          _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
+                   cred => !credentials.hasOwnProperty(cred))
 
     if (!_.isEmpty(missingCredentials)) {
         console.warn(chalk.yellow('Credentials is missing keys:'));
