@@ -1,4 +1,5 @@
 function getCredentials(argCreds) {
+
         // Is there a filename in args?
 
   var credsFile = argCreds ||
@@ -18,7 +19,8 @@ function getCredentials(argCreds) {
 
                   'credentials.json';
 
-        //  try reading & parsing the file
+        //  read and parse the credsFile
+
   try {
     var credentials = JSON5.parse(fs.readFileSync(credsFile).toString());
   } catch (e) {
@@ -27,18 +29,22 @@ function getCredentials(argCreds) {
     process.exit();
   }
 
-        //  do we have all the properties we need?
-        //  1. get the missingCredentials
+  console.log('\nUsing OAuth creds from %s\n', chalk.magenta(path.resolve(credsFile)));
 
-  var missingCredentials =
-      _.remove(['consumer_key', 'consumer_secret', 'token', 'token_secret'],
-               cred => !credentials.hasOwnProperty(cred))
+        //  do we have all the properties we need?
+        //  1. get the missing keys
+
+  var missingKeys = _.remove([  'consumer_key',
+                                'consumer_secret',
+                                'token',
+                                'token_secret'  ],
+                              cred => !credentials.hasOwnProperty(cred))
 
         // 2. Print the missing keys
 
-  if (!_.isEmpty(missingCredentials)) {
+  if (!_.isEmpty(missingKeys)) {
     console.warn(chalk.yellow('Credentials is missing keys:'));
-    missingCredentials.forEach(key => console.warn(chalk.yellow('  * %s'), key));
+    missingKeys.forEach(key => console.warn(chalk.yellow('  * %s'), key));
 
         // 3. Say how to generate user tokens if possible
 
