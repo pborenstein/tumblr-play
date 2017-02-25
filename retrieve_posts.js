@@ -83,6 +83,9 @@ var client = tumblr.createClient(getCredentials(argv.credentials));
 
 var allThePosts = [];
 
+        //  Same here. We're using options
+        //  globally and saving state
+        //  for the offset. Sad!
 
 var options = {
   notes_info: true,
