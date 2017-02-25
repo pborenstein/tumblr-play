@@ -75,13 +75,15 @@ function getCredentials(argCreds) {
 
 var client = tumblr.createClient(getCredentials(argv.credentials));
 
+        //  I seriously don't like this global
+        //  it is used in
+        //  * done()
+        //  * onTumblrData()
+        //  can we replace it with some sort of accumualtor?
+
+var allThePosts = [];
 
 
-// quick & dirty it is, life's short, done is better than perfect, I only had 2 hours for the whole project.
-// boy, I need to go past this, my eyes are bleeding...
-// ... farewell code, hope I will never see you again.
-
-var arr = [];
 var options = {
   notes_info: true,
   limit: 20,
@@ -91,7 +93,7 @@ var options = {
 
 //  This gets called when there are no more posts to get
 function done(err) {
-  console.log(JSON.stringify(arr));
+  console.log(JSON.stringify(allThePosts));
 }
 
 
@@ -113,20 +115,26 @@ function getPosts(next) {
     options.offset += options.limit;
 
     if (data.posts.length === 0) {
-      // stop there we are done
-      return next('done');
+
+          //  Calling next() with one non-null argument
+          //  tells async.forever()
+          //  to call done()
+      return next('finished');
     }
 
-    arr.push.apply(arr, data.posts);      // idiom for adding an array to
-                                          // an existing array
-                                          // Here we're adding `data.posts`
-                                          // to `arr`
- 
-    console.error('arr.length', arr.length)
- 
-    next();   // call getPosts again
-              // This still feels like magic to me.
-              // Like I get it, but I don't know why it works
+          //  idiom for concatinating arrays
+          //  here were adding this batch of data.posts
+          //  to allThePosts
+
+    allThePosts.push.apply(allThePosts, data.posts);
+
+    console.error('allThePosts.length', allThePosts.length)
+
+          //  Calling next() with no arguments
+          //  tells async.forever()
+          //  to call getPosts() again
+
+    next();
   }
 }
 
