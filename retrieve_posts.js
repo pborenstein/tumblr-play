@@ -6,10 +6,6 @@ var tumblr    = require('tumblr.js');
 var assert    = require('better-assert');
 var chalk     = require('chalk');
 var argv      = require('minimist')(process.argv.slice(2));
-var path      = require('path');
-var osHomedir = require('os-homedir');
-var fs        = require('fs');
-var JSON5     = require('json5');
 
 var getCr     = require('./tumblr-creds')
 
