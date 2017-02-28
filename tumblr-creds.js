@@ -1,4 +1,13 @@
-function getCredentials(argCreds) {
+'use strict';
+
+var _         = require('lodash');
+var path      = require('path');
+var osHomedir = require('os-homedir');
+var fs        = require('fs');
+var chalk     = require('chalk');
+var JSON5     = require('json5');
+
+exports.getCreds = function(argCreds) {
 
         // Is there a filename in args?
 
