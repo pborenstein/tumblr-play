@@ -1,6 +1,5 @@
 'use strict';
 
-var async     = require('async');
 var _         = require('lodash');
 var tumblr    = require('tumblr.js');
 var argv      = require('minimist')(process.argv.slice(2));
@@ -58,7 +57,7 @@ function getPosts(next) {
     if (data.posts.length === 0) {
 
           //  Calling next() with one non-null argument
-          //  tells async.forever()
+          //  tells myForever()
           //  to call done()
       return next('finished');
     }
@@ -72,16 +71,37 @@ function getPosts(next) {
     console.error('allThePosts.length', allThePosts.length)
 
           //  Calling next() with no arguments
-          //  tells async.forever()
+          //  tells myForever()
           //  to call getPosts() again
 
     next();
   }
 }
 
+        //  We're using our own version of async.forever()
+        //  (from async@0.9.2 https://github.com/caolan/async/blob/baee7a647e77195ee897caf1e17374eae473e517/lib/async.js#L1095-L1106)
+        //  so we can see what's going on instead of letting
+        //  a black box handle it.
+
+var myForever  = function (fn, callback) {
+  function next(err) {
+    if (err) {
+      if (callback) {
+        return callback(err);
+      }
+      throw err;
+    }
+    fn(next);
+  }
+  next();
+};
+
+
+
+
 if (usePromises) {
   console.log("haven't implemented promises version")
 } else {
-  async.forever(getPosts, done);
+  myForever(getPosts, done);
 }
 
