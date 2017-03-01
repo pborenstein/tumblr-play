@@ -4,10 +4,14 @@ var async     = require('async');
 var _         = require('lodash');
 var tumblr    = require('tumblr.js');
 var argv      = require('minimist')(process.argv.slice(2));
-var getCreds  = require('./tumblr-creds')
 
+var usePromises = false
 
-var client = tumblr.createClient(getCreds(argv.credentials));
+var credentials = require('./tumblr-creds')(argv.credentials)
+var client = tumblr.createClient({
+                                    credentials,
+                                    usePromises: usePromises
+                                 });
 
         //  I seriously don't like this global
         //  it is used in
@@ -36,7 +40,7 @@ function done(err) {
 
 function getPosts(next) {
 
-  client.posts(process.env.BLOG_NAME, options, onTumblrData);
+  client.blogPosts(process.env.BLOG_NAME, options, onTumblrData);
 
   function onTumblrData(err, data) {
     if (err) {

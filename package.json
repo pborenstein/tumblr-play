@@ -24,6 +24,6 @@
     "moment": "^2.9.0",
     "os-homedir": "^1.0.2",
     "path": "^0.12.7",
-    "tumblr.js": "0.0.4"
+    "tumblr.js": "^1.1.1"
   }
 }
