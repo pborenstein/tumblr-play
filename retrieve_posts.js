@@ -79,4 +79,9 @@ function getPosts(next) {
   }
 }
 
-async.forever(getPosts, done);
+if (usePromises) {
+  console.log("haven't implemented promises version")
+} else {
+  async.forever(getPosts, done);
+}
+
