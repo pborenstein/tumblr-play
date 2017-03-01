@@ -1,13 +1,47 @@
-'use strict';
+'use strict'
 
-var _         = require('lodash');
-var path      = require('path');
-var osHomedir = require('os-homedir');
-var fs        = require('fs');
-var chalk     = require('chalk');
-var JSON5     = require('json5');
+/****
+ * tumblr-creds.js
+ * 
+ * Get credentials for Tumblr REST API
+ * from a JSON file that looks like
+ * 
+ * {
+ *      "consumer_key" : "M1oxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+ *   "consumer_secret" : "5coxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+ *             "token" : "Adzxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+ *      "token_secret" : "2T0xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ * }
+ * 
+ * You can use this object to create a Tumblr client:
+ * 
+ * var getTumblrCredentials = require('./tumblr-creds.js')
+ * var client = tumblr.createClient(getTumblrCredentials(optCredsJSONfile));
+ * 
+ * It looks for the crendtials file in this order:
+ *      optCredsJSONfile
+ *      './tumblr-credentials.json'
+ *      './credentials.json'
+ *      '~/'tumblr-credentials.json'
+ *      './credentials.json'
+ * 
+ * If there is no file, process.exit()
+ * If the file exists, but is missing info:
+ *    say what's missing
+ *    give a hint about getting credential values
+ * 
+ * extracted from https://github.com/pborenstein/tumblr-repl/blob/7a49cc1211328834d1e7df563df9f5a220e3dfce/index.js#L23-L44
+ * 
+ ****/
 
-exports.getCreds = function(argCreds) {
+var _         = require('lodash')
+var path      = require('path')
+var osHomedir = require('os-homedir')
+var fs        = require('fs')
+var chalk     = require('chalk')
+var JSON5     = require('json5')
+
+module.exports = function getTumblrCredentials(argCreds) {
 
         // Is there a filename in args?
 

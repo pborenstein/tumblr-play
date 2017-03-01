@@ -3,14 +3,11 @@
 var async     = require('async');
 var _         = require('lodash');
 var tumblr    = require('tumblr.js');
-var assert    = require('better-assert');
-var chalk     = require('chalk');
 var argv      = require('minimist')(process.argv.slice(2));
+var getCreds  = require('./tumblr-creds')
 
-var getCr     = require('./tumblr-creds')
 
-
-var client = tumblr.createClient(getCr.getCreds(argv.credentials));
+var client = tumblr.createClient(getCreds(argv.credentials));
 
         //  I seriously don't like this global
         //  it is used in
