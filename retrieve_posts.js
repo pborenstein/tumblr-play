@@ -9,7 +9,7 @@ var usePromises = true
 var credentials = require('./tumblr-creds')(argv.credentials)
 var client = tumblr.createClient({
                                     credentials,
-                                    usePromises: usePromises
+                                    returnPromises: usePromises
                                  });
 
         //  I seriously don't like this global
@@ -25,7 +25,7 @@ var allThePosts = [];
         //  for the offset. Sad!
 
 var options = {
-  notes_info: true,
+  notes_info: false,
   limit: 20,
   offset: 0
 }
@@ -37,7 +37,7 @@ function done(err) {
 }
 
 
-function getPosts(next) {
+function getPostsCallback(next) {
 
   client.blogPosts(process.env.BLOG_NAME, options, onTumblrData);
 
@@ -97,22 +97,25 @@ var myForever  = function (fn, callback) {
 };
 
 
-function handlePromise(data) {
-  if (data.posts.length != 0) {
-    allThePosts.push.apply(allThePosts, data.posts);
-  }
+
+function getPostsPromise(offset) {
+  options.offset = offset
+  return client.blogPosts(process.env.BLOG_NAME, options)
+               .then(data => {
+                  if (data.posts.length != 0) {
+                    allThePosts.push.apply(allThePosts, data.posts)
+                    console.error('allThePosts.length', allThePosts.length)
+                    return getPostsPromise(offset + data.posts.length)
+                  }
+                })
 }
 
-
 if (usePromises) {
-  client.returnPromises()
-  var aPromise = client.blogPosts(process.env.BLOG_NAME, options)
-                       .then(handlePromise)
-                       .then(x => console.log(JSON.stringify(allThePosts)))
-
-
-
+  getPostsPromise(0)
+  .then(x => {
+    console.log(JSON.stringify(allThePosts))
+  })
 } else {
-  myForever(getPosts, done);
+  myForever(getPostsCallback, done);
 }
 
