@@ -72,7 +72,7 @@ module.exports = function getTumblrCredentials(argCreds) {
     process.exit();
   }
 
-  console.log('\nUsing OAuth creds from %s\n', chalk.magenta(path.resolve(credsFile)));
+  console.error('\nUsing OAuth creds from %s\n', chalk.magenta(path.resolve(credsFile)));
 
         //  do we have all the properties we need?
         //  1. get the missing keys
