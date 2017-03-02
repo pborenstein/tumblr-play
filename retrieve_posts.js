@@ -1,10 +1,10 @@
 'use strict';
-
+// https://github.com/subnomo/tumblr-like-dl/blob/master/index.js
 var _         = require('lodash');
 var tumblr    = require('tumblr.js');
 var argv      = require('minimist')(process.argv.slice(2));
 
-var usePromises = false
+var usePromises = true
 
 var credentials = require('./tumblr-creds')(argv.credentials)
 var client = tumblr.createClient({
@@ -97,10 +97,21 @@ var myForever  = function (fn, callback) {
 };
 
 
+function handlePromise(data) {
+  if (data.posts.length != 0) {
+    allThePosts.push.apply(allThePosts, data.posts);
+  }
+}
 
 
 if (usePromises) {
-  console.log("haven't implemented promises version")
+  client.returnPromises()
+  var aPromise = client.blogPosts(process.env.BLOG_NAME, options)
+                       .then(handlePromise)
+                       .then(x => console.log(JSON.stringify(allThePosts)))
+
+
+
 } else {
   myForever(getPosts, done);
 }
