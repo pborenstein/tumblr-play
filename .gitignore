@@ -35,4 +35,4 @@ posts_only_notes.json
 credentials*.json
 *.json
 !package.json
-.vscode
+!launch.json
