@@ -1,12 +1,18 @@
 # Tumblr blog content extraction and analysis
 
-> Tonight (2nd of February 2015) a friend of mine asked me if I knew a way to quickly count every likes/reblog/reply on his blog. One hour later here we are.
+A tool to play with the tumblr API, originally forked from https://github.com/FGRibreau/tumblr-analysis
+
+*   Updated to use tumblr.js 1.1.1
+*   Use either callbacks or promises
+*   Take credential code form tumblr-repl
+*   Lots of comments
 
 
-### Setup
+
+## Setup
 
 - Install NodeJS & Npm
-- `git clone tumblr-notes`
+- `git clone tumblr-play`
 - `npm install`
 
 ### How to extract every post (with notes information) of a tumblr blog as JSON
