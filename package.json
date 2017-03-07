@@ -1,7 +1,7 @@
 {
-  "name": "tumblr-analysis",
-  "version": "2.0.2",
-  "description": "Extract every tumblr posts as JSON from a blog and analyse them.",
+  "name": "tumblr-play",
+  "version": "1.0.0",
+  "description": "Play with tumblr API",
   "main": "index.js",
   "scripts": {},
   "keywords": [
