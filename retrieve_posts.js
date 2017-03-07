@@ -25,7 +25,8 @@ var allThePosts = [];
         //  for the offset. Sad!
 
 var options = {
-  notes_info: false,
+  notes_info: true,
+  reblog_info: true,
   limit: 20,
   offset: 0
 }
@@ -113,7 +114,7 @@ function getPostsPromise(offset) {
 if (usePromises) {
   getPostsPromise(0)
   .then(x => {
-    console.log(JSON.stringify(allThePosts))
+    console.log(JSON.stringify(allThePosts, null, 2))
   })
 } else {
   myForever(getPostsCallback, done);
